@@ -68,7 +68,9 @@ def get_contents(filename):
     """Parse the contents of a file. Each line is a JSON encoded document."""
     global PREPROCESS_FN
     documents = []
-    if filename.endswith(".tsv"):
+    if filename.endswith(".tsv.gz"):
+        raise NotImplementedError("TODO")
+    elif filename.endswith(".tsv"):
         import csv
         with open(filename) as tsvfile:
             reader = csv.reader(tsvfile, delimiter='\t')

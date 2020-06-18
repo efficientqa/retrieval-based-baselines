@@ -1,6 +1,6 @@
 # README for retrieval-based baselines
 
-*Working on progress*
+*Working in progress*
 
 This repo provides guidelines for training and testing retrieval-based baselines for [NeuRIPS Competition on Efficient Open-domain Question Answering](http://efficientqa.github.io/).
 
@@ -25,6 +25,7 @@ All codes are largely based on the original implementation, and we provide comma
 2. [DrQA retrieval](#drqa-retrieval)
 3. [DPR retrieval](#dpr-retrieval)
 4. [DPR reader](#dpr-reader)
+5. [Result](#result)
 
 ## Getting ready
 
@@ -33,25 +34,24 @@ All codes are largely based on the original implementation, and we provide comma
 ```bash
 git clone https://github.com/facebookresearch/DPR.git # dependency
 git clone https://github.com/efficientqa/retrieval-based-baselines.git # this repo
-cd retrieval-based-baselines
 ```
 
 ### Download data
 
-Follow [DPR repo][dpr] in order to download NQ data and Wikipedia DB. Specificially,
+Follow [DPR repo][dpr] in order to download NQ data and Wikipedia DB. Specificially, after running `cd DPR`,
 
 1. Download QA pairs by `python3 data/download_data.py --resource data.retriever.qas --output_dir {base_dir}`.
-2. Download wikipedia DB by `python3 data/download_data.py --resource data.wikipedia_split --output_dir {base_dir} --keep-gzip`.
+2. Download wikipedia DB by `python3 data/download_data.py --resource data.wikipedia_split --output_dir {base_dir}`.
 3. Download gold question-passage pairs by `python3 data/download_data.py --resource data.gold_passages_info --output_dir {base_dir}`.
 
-Optionally, if you want to use Wikipedia articles found from the train data only (78,050 unique articles; 1,642,855 unique passages), run `python3 keep_seen_docs_only --db_path {base_dir}/data/wikipedia_split/psgs_w100.tsv --data_path {base_dir}/data/retriever/qas/nq-train.csv`. This script will save new Wikipedia DB with seen articles at `{base_dir}/data/wikipedia_split/psgs_w100_seen_only.tsv`.
+Optionally, if you want to use Wikipedia articles found from the train data only (78,050 unique articles; 1,642,855 unique passages), run `cd ../retrieval-based-baselines; python3 keep_seen_docs_only --db_path {base_dir}/data/wikipedia_split/psgs_w100.tsv --data_path {base_dir}/data/retriever/qas/nq-train.csv`. This script will save new Wikipedia DB with seen articles at `{base_dir}/data/wikipedia_split/psgs_w100_seen_only.tsv`.
 
 From now on, we will refer Wikipedia DBs (either full or seen only) as `db_path`.
 
 
 ## DrQA retrieval
 
-Scripts for DrQA is largely adapted from [the original DrQA repo][drqa].
+Make sure to be in `retrieval-based-baselines` directory to run scripts for DrQA (largely adapted from [the original DrQA repo][drqa]).
 
 **Step 1**: Run `pip install -r requirements.txt`
 
@@ -80,7 +80,7 @@ Follow [DPR repo][dpr] to train DPR retriever and make inference. You can follow
 
 If you want to use retriever checkpoint provided by DPR, follow these three steps.
 
-**Step 1**: Download retriever checkpoint by `python3 data/download_data.py --resource checkpoint.retriever.multiset.bert-base-encoder --output_dir {base_dir}`.
+**Step 1**: Make sure to be in `DPR` directory, and download retriever checkpoint by `python3 data/download_data.py --resource checkpoint.retriever.multiset.bert-base-encoder --output_dir {base_dir}`.
 
 **Step 2**: Save passage vectors by following [Generating representations](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). Note that you can replace `ctx_file` to your own `db_path` if you are trying "seen only" version. In particular, you can do
 ```
@@ -159,6 +159,12 @@ python train_reader.py \
 [drqa]: https://github.com/facebookresearch/DrQA/
 [dpr]: https://github.com/facebookresearch/DPR
 
+## Result
 
-
+|Model|Exact Mach|Disk usage (gb)|
+|---|---|---|
+|DrQA-full|-|20.1|
+|DrQA-seen-only|-|2.8|
+|DPR-full|41.5|66.4|
+|DPR-seen-only|-|5.9|
 
