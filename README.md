@@ -6,8 +6,8 @@ This repo provides guidelines for training and testing retrieval-based baselines
 
 We provide tutorials for two retrieval-based baselines.
 
-- DrQA: Danqi Chen, Adam Fisch, Jason Weston, Antoine Bordes. [Reading Wikipedia to Answer Open-Domain Questions](https://arxiv.org/abs/1704.00051). ACL 2017. [Original implementation][drqa].
-- DPR: Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, Wen-tau Yih, [Dense Passage Retrieval for Open-Domain Question Answering](https://arxiv.org/abs/2004.04906), Preprint 2020. [Original implementation][dpr].
+- DrQA: Danqi Chen, Adam Fisch, Jason Weston, Antoine Bordes. [Reading Wikipedia to Answer Open-Domain Questions](https://arxiv.org/abs/1704.00051). ACL 2017. [[Original implementation][drqa]]
+- DPR: Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, Wen-tau Yih, [Dense Passage Retrieval for Open-Domain Question Answering](https://arxiv.org/abs/2004.04906), Preprint 2020. [[Original implementation][dpr]]
 
 Retrieval-based baselines are composed with two steps.
 - **Retrieval** is for retrieving Wikipedia passages that are related to the question. We use DrQA and DPR retrieval as examples of sparse retrieval (TF-IDF) and dense retrieval, respectively.
@@ -53,43 +53,43 @@ From now on, we will refer Wikipedia DBs (either full or seen only) as `db_path`
 
 Scripts for DrQA is largely adapted from [the original DrQA repo][drqa].
 
-First, install required packages by following the instruction in the original repo.
+**Step 1**: Run `pip install -r requirements.txt`
 
-Then, build Sqlite DB via:
+**Step 2**: Build Sqlite DB via:
 ```
 mkdir -p {base_dir}/drqa_retrieval
 python3 build_db.py {db_path} {base_dir}/drqa_retrieval/db.db --num-workers 60`.
 ```
-Next, run the following command to build TF-IDF index.
+**Step 3**: Run the following command to build TF-IDF index.
 ```
 python3 build_tfidf.py {base_dir}/drqa_retrieval/db.db {base_dir}/drqa_retrieval
 ```
 It will save TF-IDF index in `{base_dir}/drqa_retrieval`
 
-Run inference code to save retrieval results.
+**Step 4**: Run inference code to save retrieval results.
 ```
 python3 inference_tfidf.py --qa_file {base_dir}/data/retriever/qas/nq-{train|dev|test}.csv --db_path {db_path} --out_file {base_dir}/drqa_retrieval/nq-{train|dev|test}-tfidf.json --tfidf_path {path_to_tfidf_index}
 ```
 
 The resulting files, `{base_dir}/drqa_retrieval/nq-{train|dev|test}-tfidf.json` are ready to be fed into the DPR reader.
 
-## DPR retriever
+## DPR retrieval
 
 Follow [DPR repo][dpr] to train DPR retriever and make inference. You can follow steps until [Retriever validation](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents).
 
 
 If you want to use retriever checkpoint provided by DPR, follow these three steps.
 
-Step 1: Download retriever checkpoint by `python3 data/download_data.py --resource checkpoint.retriever.multiset.bert-base-encoder --output_dir {base_dir}`.
+**Step 1**: Download retriever checkpoint by `python3 data/download_data.py --resource checkpoint.retriever.multiset.bert-base-encoder --output_dir {base_dir}`.
 
-Step 2: Save passage vectors by following [Generating representations](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). Note that you can replace `ctx_file` to your own `db_path` if you are trying "seen only" version. In particular, you can do
+**Step 2**: Save passage vectors by following [Generating representations](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). Note that you can replace `ctx_file` to your own `db_path` if you are trying "seen only" version. In particular, you can do
 ```
 python3 generate_dense_embeddings.py \
   --model_file {base_dir}/checkpoint/retriever/multiset/bert-base-encoder.cp \
   --ctx_file {db_path} --shard_id {0-19} --num_shards 20 --out_file {base_dir}/dpr_ctx
 ```
 
-Step 3: Save retrieval results by following [Retriever validation](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). In particular, you can do
+**Step 3**: Save retrieval results by following [Retriever validation](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). In particular, you can do
 ```
 mkdir -p {base_dir}/dpr_retrieval
 python3 dense_retriever.py \
@@ -110,7 +110,7 @@ Now, `{base_dir}/dpr_retrieval/nq-{train|dev|test}.json` is ready to be fed into
 
 The following instruction is for training the reader using DrQA retrieval results, saved in `{base_dir}/drqa_retrieval/nq-{train|dev|test}-tfidf.json`. In order to use DPR retrieval results, simply replace paths to these files to `{base_dir}/dpr_retrieval/nq-{train|dev|test}.json`
 
-### 1. Preprocess data
+**Step 1**: Preprocess data.
 
 ```
 python3 preprocess_reader_data.py \
@@ -123,7 +123,7 @@ python3 preprocess_reader_data.py \
   --is_train_set # specify this only when it is train data
 ```
 
-### 2. Train the reader
+**Step 2**: Train the reader.
 ```
 python3 train_reader.py \
         --encoder_model_type hf_bert \
@@ -144,7 +144,7 @@ python3 train_reader.py \
         --passages_per_question_predict 50
 ```
 
-###. 3. Test the reader
+**Step 3**: Test the reader.
 ```
 python train_reader.py \
   --prediction_results_file {base_dir}/checkpoints/reader_from_drqa/dev_predictions.json \
