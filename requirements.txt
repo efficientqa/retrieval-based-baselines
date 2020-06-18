@@ -1,0 +1,8 @@
+numpy
+scikit-learn
+regex
+tqdm
+scipy
+nltk
+elasticsearch
+pexpect==4.2.1
