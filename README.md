@@ -2,7 +2,7 @@
 
 *Working in progress*
 
-This repo provides guidelines for training and testing retrieval-based baselines for [NeuRIPS Competition on Efficient Open-domain Question Answering](http://efficientqa.github.io/).
+This repo provides guidelines for training and testing retrieval-based baselines for [NeurIPS Competition on Efficient Open-domain Question Answering](http://efficientqa.github.io/).
 
 We provide tutorials for two retrieval-based baselines.
 
@@ -15,9 +15,9 @@ Retrieval-based baselines are composed with two steps.
 
 All codes are largely based on the original implementation, and we provide command lines to train and test the model specifically for our competition.
 
-*If you want to try parameter-only baselines (T5-based) for the competition, please note that implementations on T5-based Closed-book QA model is available [here](https://github.com/google-research/google-research/tree/master/t5_closed_book_qa).*
+*Note: If you want to try parameter-only baselines (T5-based) for the competition, please note that implementations on T5-based Closed-book QA model is available [here](https://github.com/google-research/google-research/tree/master/t5_closed_book_qa).*
 
-*If you want simple guidelines on making end-to-end QA predictions using pretrained models, please refer to [this tutorial](https://github.com/efficientqa/efficientqa.github.io/blob/master/getting_started.md).*
+*Note: If you want simple guidelines on making end-to-end QA predictions using pretrained models, please refer to [this tutorial](https://github.com/efficientqa/efficientqa.github.io/blob/master/getting_started.md).*
 
 ## Content
 
@@ -46,7 +46,7 @@ Follow [DPR repo][dpr] in order to download NQ data and Wikipedia DB. Specificia
 
 Optionally, if you want to use Wikipedia articles found from the train data only (78,050 unique articles; 1,642,855 unique passages), run `cd ../retrieval-based-baselines; python3 keep_seen_docs_only --db_path {base_dir}/data/wikipedia_split/psgs_w100.tsv --data_path {base_dir}/data/retriever/qas/nq-train.csv`. This script will save new Wikipedia DB with seen articles at `{base_dir}/data/wikipedia_split/psgs_w100_seen_only.tsv`.
 
-From now on, we will refer Wikipedia DBs (either full or seen only) as `db_path`.
+From now on, we will denote Wikipedia DBs (either full or seen only) as `db_path`.
 
 
 ## DrQA retrieval
@@ -68,7 +68,7 @@ It will save TF-IDF index in `{base_dir}/drqa_retrieval`
 
 **Step 4**: Run inference code to save retrieval results.
 ```
-python3 inference_tfidf.py --qa_file {base_dir}/data/retriever/qas/nq-{train|dev|test}.csv --db_path {db_path} --out_file {base_dir}/drqa_retrieval/nq-{train|dev|test}-tfidf.json --tfidf_path {path_to_tfidf_index}
+python3 inference_tfidf.py --qa_file {base_dir}/data/retriever/qas/nq-{train|dev|test}.csv --db_path {db_path} --out_file {base_dir}/drqa_retrieval/nq-{train|dev|test}.json --tfidf_path {path_to_tfidf_index}
 ```
 
 The resulting files, `{base_dir}/drqa_retrieval/nq-{train|dev|test}-tfidf.json` are ready to be fed into the DPR reader.
@@ -84,9 +84,7 @@ If you want to use retriever checkpoint provided by DPR, follow these three step
 
 **Step 2**: Save passage vectors by following [Generating representations](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). Note that you can replace `ctx_file` to your own `db_path` if you are trying "seen only" version. In particular, you can do
 ```
-python3 generate_dense_embeddings.py \
-  --model_file {base_dir}/checkpoint/retriever/multiset/bert-base-encoder.cp \
-  --ctx_file {db_path} --shard_id {0-19} --num_shards 20 --out_file {base_dir}/dpr_ctx
+python3 generate_dense_embeddings.py --model_file {base_dir}/checkpoint/retriever/multiset/bert-base-encoder.cp --ctx_file {db_path} --shard_id {0-19} --num_shards 20 --out_file {base_dir}/dpr_ctx
 ```
 
 **Step 3**: Save retrieval results by following [Retriever validation](https://github.com/facebookresearch/DPR/tree/master#retriever-validation-against-the-entire-set-of-documents). In particular, you can do
@@ -114,7 +112,7 @@ The following instruction is for training the reader using DrQA retrieval result
 
 ```
 python3 preprocess_reader_data.py \
-  --retriever_results {base_dir}/drqa_retrieval/nq-{train|dev|test}-tfidf.json \
+  --retriever_results {base_dir}/drqa_retrieval/nq-{train|dev|test}.json \
   --gold_passages {base_dir}/data/gold_passages_info/nq_{train|dev|test}.json \
   --do_lower_case \
   --pretrained_model_cfg bert-base-uncased \
@@ -128,8 +126,8 @@ python3 preprocess_reader_data.py \
 python3 train_reader.py \
         --encoder_model_type hf_bert \
         --pretrained_model_cfg bert-base-uncased \
-        --train_file {base_dir}/drqa_retrieval/'nq-train-tfidf*.pkl' \
-        --dev_file {base_dir}/drqa_retrieval/'nq-dev-tfidf*.pkl' \
+        --train_file {base_dir}/drqa_retrieval/'nq-train*.pkl' \
+        --dev_file {base_dir}/drqa_retrieval/'nq-dev*.pkl' \
         --output_dir {base_dir}/checkpoints/reader_from_drqa \
         --seed 42 \
         --learning_rate 1e-5 \
@@ -149,7 +147,7 @@ python3 train_reader.py \
 python train_reader.py \
   --prediction_results_file {base_dir}/checkpoints/reader_from_drqa/dev_predictions.json \
   --eval_top_docs 10 20 40 50 80 100 \
-  --dev_file {base_dir}/drqa_retrieval/`nq-dev-tfidf*.pkl` \
+  --dev_file {base_dir}/drqa_retrieval/`nq-dev*.pkl` \
   --model_file {base_dir}/checkpoints/reader_from_drqa/{checkpoint file} \
   --dev_batch_size 80 \
   --passages_per_question_predict 100 \
@@ -163,8 +161,9 @@ python train_reader.py \
 
 |Model|Exact Mach|Disk usage (gb)|
 |---|---|---|
-|DrQA-full|-|20.1|
-|DrQA-seen-only|-|2.8|
-|DPR-full|41.5|66.4|
-|DPR-seen-only|-|5.9|
+|DrQA-full|32.0|20.1|
+|DrQA-seen-only|31.1|2.8|
+|DPR-full|41.4|66.4|
+|DPR-seen-only|35.1|5.9|
+
 
