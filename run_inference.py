@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # general params
     parser.add_argument('--qa_file', required=True, type=str, default=None)
     parser.add_argument('--retrieval_type', type=str, default='drqa',
-                        choices=['drqa', 'dpr'])
+                        choices=['tfidf', 'dpr'])
     parser.add_argument('--dpr_model_file', type=str, default="/private/home/sewonmin/EfficientQA-baselines/DP")
     parser.add_argument('--db_path', type=str, default="/checkpoint/sewonmin/dpr/data/wikipedia_split/psgs_w100_seen_only.tsv")
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         questions.append(question)
         question_answers.append(answers)
 
-    if args.retrieval_type=="drqa":
+    if args.retrieval_type=="tfidf":
         import drqa_retriever as retriever
         ranker = retriever.get_class('tfidf')(tfidf_path=args.tfidf_path)
         top_ids_and_scores = []
