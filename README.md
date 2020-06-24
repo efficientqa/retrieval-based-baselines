@@ -162,8 +162,8 @@ python train_reader.py \
 |Model|Exact Mach|Disk usage (gb)|
 |---|---|---|
 |TFIDF-full|32.0|20.1|
-|TFIDF-subset|31.1|2.8|
-|DPR-full|41.4|66.4|
-|DPR-subset|35.1|5.9|
+|TFIDF-subset|31.0|2.8|
+|DPR-full|41.0|66.4|
+|DPR-subset|34.8|5.9|
 
 

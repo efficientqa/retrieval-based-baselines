@@ -61,18 +61,19 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    '''questions = []
-    with open(args.qa_file) as ifile:
-        reader = csv.reader(ifile, delimiter='\t')
-        for row in reader:
-            questions.append(row[0])'''
     questions = []
     question_answers = []
-    for ds_item in parse_qa_csv_file(args.qa_file):
-        question, answers = ds_item
-        questions.append(question)
-        question_answers.append(answers)
-
+    if args.qa_file.endswith(".csv"):
+        for ds_item in parse_qa_csv_file(args.qa_file):
+            question, answers = ds_item
+            questions.append(question)
+            question_answers.append(answers)
+    else:
+        with open(args.qa_file, "r") as f:
+            for line in f:
+                d = json.loads(line)
+                questions.append(d["question"])
+                question_answers.append(d["answer"])
     if args.retrieval_type=="tfidf":
         import drqa_retriever as retriever
         ranker = retriever.get_class('tfidf')(tfidf_path=args.tfidf_path)

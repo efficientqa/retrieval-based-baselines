@@ -6,7 +6,9 @@ tfidf_index="random"
 dpr_index="random"
 dpr_retrieval_checkpoint="random"
 n_paragraphs="100"
-python3 ../DPR/data/download_data.py --resource data.retriever.qas.nq --output_dir ${base_dir}
+
+wget https://raw.githubusercontent.com/efficientqa/nq-open/master/NQ-open.dev.jsonl
+#python3 ../DPR/data/download_data.py --resource data.retriever.qas.nq --output_dir ${base_dir}
 python3 ../DPR/data/download_data.py --resource data.wikipedia_split --output_dir ${base_dir}
 
 if [ $RETRIEVAL = "tfidf-full" ]
@@ -53,7 +55,7 @@ then
     n_paragraphs="40"
 fi
 python3 run_inference.py \
-  --qa_file ${base_dir}/data/retriever/qas/nq-test.csv \
+  --qa_file NQ-open.dev.jsonl \
   --retrieval_type ${retrieval_type} \
   --db_path ${base_dir}/data/wikipedia_split/${db_name} \
   --tfidf_path ${tfidf_index} \
