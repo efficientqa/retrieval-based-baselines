@@ -39,7 +39,7 @@ git clone https://github.com/efficientqa/retrieval-based-baselines.git # this re
 Follow [DPR repo][dpr] in order to download NQ data and Wikipedia DB. Specificially, after running `cd DPR` and let `base_dir` as your base directory to store data and pretrained models,
 
 
-1. Download QA pairs by `python3 data/download_data.py --resource data.retriever.qas --output_dir ${base_dir}`.
+1. Download QA pairs by `python3 data/download_data.py --resource data.retriever.qas --output_dir ${base_dir}` and `python3 data/download_data.py --resource data.retriever.nq --output_dir ${base_dir}`.
 2. Download wikipedia DB by `python3 data/download_data.py --resource data.wikipedia_split --output_dir ${base_dir}`.
 3. Download gold question-passage pairs by `python3 data/download_data.py --resource data.gold_passages_info --output_dir ${base_dir}`.
 
