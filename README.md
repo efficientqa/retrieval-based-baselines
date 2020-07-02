@@ -91,7 +91,7 @@ python3 generate_dense_embeddings.py --model_file ${base_dir}/checkpoint/retriev
 ```
 mkdir -p ${base_dir}/dpr_retrieval
 python3 dense_retriever.py \
-  --model_file ${base_dir}/checkpoint/retriever/multiset/bert-base-encoder.cp \
+  --model_file ${base_dir}/checkpoint/retriever/single/nq/bert-base-encoder.cp \
   --ctx_file  ${dp_path} \
   --qa_file ${base_dir}/data/retriever/qas/nq-{train|dev|test}.csv \
   --encoded_ctx_file ${base_dir}/'dpr_ctx*' \

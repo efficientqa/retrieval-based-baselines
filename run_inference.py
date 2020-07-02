@@ -146,7 +146,7 @@ if __name__ == '__main__':
                 for r in prediction_results:
                     save_results.append({
                         'question': r.id,
-                        'prediction': r.predictions[50].prediction_text
+                        'prediction': r.predictions[args.passages_per_question_predict].prediction_text
                     })
                 output.write(json.dumps(save_results, indent=4) + "\n")
 
