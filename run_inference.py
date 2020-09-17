@@ -73,6 +73,8 @@ if __name__ == '__main__':
             for line in f:
                 d = json.loads(line)
                 questions.append(d["question"])
+                if "answer" not in d:
+                    d["answer"] = "random"
                 question_answers.append(d["answer"])
     if args.retrieval_type=="tfidf":
         import drqa_retriever as retriever
